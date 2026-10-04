@@ -8,7 +8,7 @@ import './settings.js?v=112';
 import './toolbar.js?v=111';
 import './banker.js?v=106';
 import './counter.js?v=107';
-import './prize-board.js?v=110';
+import './prize-board.js?v=111';
 import './suggest.js?v=113';
 import './customization.js?v=104';
 

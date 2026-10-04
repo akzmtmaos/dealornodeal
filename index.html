@@ -6,7 +6,7 @@
 <title>Deal or No Deal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Archivo+Black&family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Oswald:wght@300;500;600;700&family=Americana+Condensed:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=38">
+<link rel="stylesheet" href="style.css?v=39">
 </head>
 <body>
 <div class="app">
@@ -121,6 +121,11 @@
     <div class="settings-title">Prize Board Selection</div>
     <input type="text" id="pbSaveName" placeholder="Board name..." maxlength="24" style="width:100%;box-sizing:border-box;padding:6px 10px;margin-bottom:12px;border-radius:8px;border:1px solid rgba(139,147,168,0.3);background:rgba(255,255,255,0.05);color:var(--ivory);font-size:0.78rem;font-family:'Inter',sans-serif;outline:none;">
     <div class="pb-list" id="pbList" style="flex:1;overflow-y:auto;"></div>
+    <div class="pb-transfer-row">
+      <button class="btn ghost" id="pbExportBtn" type="button">Export boards</button>
+      <button class="btn ghost" id="pbImportBtn" type="button">Import boards</button>
+      <input id="pbImportFile" type="file" accept=".json,application/json" hidden>
+    </div>
     <div class="pb-save-row" style="margin-top:12px;">
       <button class="btn primary" id="pbSaveConfirmBtn">Save</button>
       <button class="btn ghost" id="closePbSelectBtn">Close</button>
@@ -248,13 +253,26 @@
   // The modular game (js/main.js) is an ES module, which requires http(s://).
   // When opened directly from disk (file://), fall back to the bundled script.js.
   (function () {
+    try {
+      var legacyBoards = JSON.parse(window.localStorage.getItem('dnd_board_bg'));
+      var validLegacyBoards = Array.isArray(legacyBoards) && legacyBoards.length > 0 &&
+        legacyBoards.every(function (board) {
+          return board && typeof board.name === 'string' && board.name.trim() &&
+            Array.isArray(board.values) && board.values.length >= 4 && board.values.length <= 26 &&
+            board.values.every(function (value) { return Number.isFinite(value) && value >= 0; });
+        });
+      if (validLegacyBoards) {
+        window.localStorage.setItem('dnd_saved_boards', JSON.stringify(legacyBoards));
+        window.localStorage.setItem('dnd_board_bg', 'default');
+      }
+    } catch (e) { /* localStorage may be unavailable for file:// */ }
     var isFile = window.location.protocol === 'file:';
     if (isFile) {
-      document.write('<script src="script.js?v=56"><\/script>');
+      document.write('<script src="script.js?v=57"><\/script>');
     } else {
       var s = document.createElement('script');
       s.type = 'module';
-      s.src = 'js/main.js?v=23';
+      s.src = 'js/main.js?v=24';
       document.body.appendChild(s);
     }
   })();
