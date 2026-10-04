@@ -1,0 +1,487 @@
+  /* ---------- Case Grid: plain layout — each row of cases stands on a wide
+     animated yellow & blue shelf (see .case-row::after below), like the show's case table. ---------- */
+  .case-grid{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+    padding:18px;
+  }
+  /* 20-case layout only: wider case gap + staggered rows (1st & 3rd) windowed
+     off rows 2 & 4 by half a case. All other counts keep the default spacing. */
+  .case-grid.grid-20{
+    --case-gap:16px;
+    --stagger-offset:calc(84px / 2 + var(--case-gap) / 2);
+    --rail-shift:calc(-1 * (var(--stagger-offset, 0px) + 18px));
+  }
+  .case-row{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:var(--case-gap, 10px);
+    flex-wrap:nowrap;
+    width:100%;
+  }
+  /* 20-case layout: rows alternate flush-left and indented — 1st & 3rd rows shift
+     right by --stagger-offset, 2nd & 4th stay flush. */
+  .case-row.flush{
+    justify-content:flex-start;
+  }
+  .case-row.indent{
+    justify-content:flex-start;
+    margin-left:0;
+    box-sizing:border-box;
+  }
+  .case-grid.grid-20 .case-row:nth-child(1),
+  .case-grid.grid-20 .case-row:nth-child(3),
+  .case-grid.grid-20 .case-row:nth-child(4){
+    justify-content:space-between;
+    transform:none;
+    padding:0 var(--case-gap, 16px);
+    box-sizing:border-box;
+  }
+  .case-grid.grid-20 .case-row:nth-child(2){
+    justify-content:space-between;
+    padding-right:var(--case-gap, 16px);
+    box-sizing:border-box;
+  }
+
+  .case-grid.grid-20 .case-row:nth-child(1) .case-shelf-back,
+  .case-grid.grid-20 .case-row:nth-child(3) .case-shelf-back,
+  .case-grid.grid-20 .case-row:nth-child(4) .case-shelf-back,
+  .case-grid.grid-20 .case-row.indent .case-shelf-back{
+    left:0;
+    width:100%;
+  }
+
+  @keyframes shelfFlowLeft{
+    0%{background-position:0% center;}
+    100%{background-position:100% center;}
+  }
+  @keyframes shelfFlowRight{
+    0%{background-position:100% center;}
+    100%{background-position:0% center;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .case-row::before,
+    .case-row::after,
+    .case-shelf-back{animation:none !important;}
+  }
+
+  .case-row::before,
+  .case-row::after{
+    content:'';
+    position:absolute;
+    top:calc(100% + 2px);
+    height:6px;
+    background:repeating-linear-gradient(90deg, #ffd84d 0, #2b6fff 25%, #ffd84d 50%);
+    background-size:200% 100%;
+    box-shadow:0 2px 6px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+
+  .case-row::before{
+    left:0;
+    right:50%;
+    animation:shelfFlowLeft 3s linear infinite;
+  }
+  .case-row::after{
+    left:50%;
+    right:0;
+    animation:shelfFlowRight 3s linear infinite;
+  }
+
+  .case-shelf-top,
+  .case-shelf-back{
+    position:absolute;
+    left:0;
+    right:0;
+    pointer-events:none;
+    z-index:0;
+    background:none;
+    box-shadow:none;
+  }
+  .case-shelf-top{
+    top:-10px;
+    height:6px;
+  }
+  .case-shelf-top.secondary-top-shelf{
+    top:-2px;
+  }
+  .case-shelf-back{
+    top:calc(100% + 10px);
+    height:6px;
+  }
+  .case-shelf-top::before,
+  .case-shelf-top::after{
+    content:'';
+    position:absolute;
+    top:0;
+    height:100%;
+    background:repeating-linear-gradient(90deg, #ffd84d 0, #2b6fff 25%, #ffd84d 50%);
+    background-size:200% 100%;
+    box-shadow:0 2px 6px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .case-shelf-top::before{
+    left:0;
+    right:50%;
+    animation:shelfFlowLeft 3s linear infinite;
+  }
+  .case-shelf-top::after{
+    left:50%;
+    right:0;
+    animation:shelfFlowRight 3s linear infinite;
+  }
+  .case-shelf-top::before,
+  .case-shelf-top::after,
+  .case-shelf-back::before,
+  .case-shelf-back::after{
+    content:'';
+    position:absolute;
+    top:0;
+    height:100%;
+    background:repeating-linear-gradient(90deg, #ffd84d 0, #2b6fff 25%, #ffd84d 50%);
+    background-size:200% 100%;
+    box-shadow:0 2px 6px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .case-shelf-top::before,
+  .case-shelf-back::before{
+    left:0;
+    right:50%;
+    animation:shelfFlowLeft 3s linear infinite;
+  }
+  .case-shelf-top::after,
+  .case-shelf-back::after{
+    left:50%;
+    right:0;
+    animation:shelfFlowRight 3s linear infinite;
+  }
+
+  /* Whole-table shelf reactions during a case reveal: the moment a value is
+     revealed every shelf rail across the grid (the under-row shelves, the back
+     rails and the top rail) washes to one solid color — all yellow (no
+     gradient) when the value is below $100K, all red when it's $100K or higher.
+     Both are brief flashes: the rails return to the normal animated gradient
+     shortly after. The gradient loops keep running underneath, so the shelves
+     resume seamlessly when the wash lifts. */
+  .case-grid.shelf-flash-yellow .case-row::before,
+  .case-grid.shelf-flash-yellow .case-row::after,
+  .case-grid.shelf-flash-yellow .case-shelf-back,
+  .case-grid.shelf-flash-yellow .case-shelf-back::before,
+  .case-grid.shelf-flash-yellow .case-shelf-back::after,
+  .case-grid.shelf-flash-yellow .case-shelf-top::before,
+  .case-grid.shelf-flash-yellow .case-shelf-top::after{
+    background:#ffd84d;
+    background-size:auto;
+  }
+  .case-grid.shelf-red-all .case-row::before,
+  .case-grid.shelf-red-all .case-row::after,
+  .case-grid.shelf-red-all .case-shelf-back,
+  .case-grid.shelf-red-all .case-shelf-back::before,
+  .case-grid.shelf-red-all .case-shelf-back::after,
+  .case-grid.shelf-red-all .case-shelf-top::before,
+  .case-grid.shelf-red-all .case-shelf-top::after{
+    background:#ff3b3b;
+    background-size:auto;
+  }
+
+  .briefcase{
+    position:relative;
+    aspect-ratio:1/0.82;
+    border:none;
+    background:none;
+    padding:0;
+    cursor:pointer;
+    overflow:visible;
+    perspective:700px;
+    transition:transform .18s ease, opacity 0.6s ease, filter 0.6s ease;
+  }
+  .case-row .briefcase{
+    flex:0 1 84px;
+    min-width:0;
+  }
+  .briefcase:hover:not(:disabled):not(.opened){transform:translateY(-3px);}
+  .briefcase:active:not(:disabled):not(.opened){transform:translateY(0) scale(0.97);}
+  .briefcase:disabled{cursor:default;}
+
+  .case-base{
+    position:absolute;inset:0;
+    border-radius:10px;
+    background:linear-gradient(155deg,var(--silver-lt) 0%, var(--silver) 45%, var(--silver-mid) 75%, var(--silver-dk) 100%);
+    box-shadow:0 8px 16px rgba(0,0,0,0.45), inset 0 2px 0 rgba(255,255,255,0.28), inset 0 -6px 10px rgba(0,0,0,0.15);
+  }
+  .case-handle{
+    background-color: white;
+    position:absolute;
+    top:-11%;
+    left:50%;
+    transform:translateX(-50%);
+    width:24%;
+    height:20%;
+    border:2.5px solid var(--silver-dk);
+    border-bottom:none;
+    border-radius:6px 6px 0 0;
+    background:transparent;
+    z-index:2;
+  }
+  .case-latch{
+    position:absolute;left:50%;top:8.5%;transform:translateX(-50%);
+    width:14%;height:7%;
+    background:linear-gradient(160deg,var(--silver-lt),var(--silver-dk));
+    border:1px solid rgba(0,0,0,0.35);
+    border-radius:2px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.5);
+    transition:opacity .18s ease, transform .18s ease;
+    z-index:5;
+  }
+  /* a subtle seam line near the handle - reads as part of the case body, not a separate slab */
+  .case-lid{
+    position:absolute;left:6%;right:6%;top:9%;height:2px;
+    background:rgba(0,0,0,0.22);
+    box-shadow:0 1px 0 rgba(255,255,255,0.35);
+    z-index:4;
+  }
+  .briefcase.unlatch .case-latch{
+    opacity:0;
+    transform:translateX(-50%) scale(0.55);
+  }
+
+  /* the dark recessed compartment - always sits behind the cover. Once the cover
+     swings open, this (and the amount inside it) is what gets revealed. */
+  .case-interior{
+    position:absolute;left:2%;right:2%;top:16%;bottom:8%;
+    background-color:#000000;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2760%27%20height%3D%2734.64%27%20viewBox%3D%270%200%2060%2034.64%27%3E%3Crect%20width%3D%2760%27%20height%3D%2734.64%27%20fill%3D%27%23000000%27/%3E%3Cpolygon%20points%3D%27-11.5%2C-17.32%20-20.75%2C-1.3%20-39.25%2C-1.3%20-48.5%2C-17.32%20-39.25%2C-33.34%20-20.75%2C-33.34%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%27-11.5%2C17.32%20-20.75%2C33.34%20-39.25%2C33.34%20-48.5%2C17.32%20-39.25%2C1.3%20-20.75%2C1.3%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%27-11.5%2C51.96%20-20.75%2C67.98%20-39.25%2C67.98%20-48.5%2C51.96%20-39.25%2C35.94%20-20.75%2C35.94%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%2718.5%2C0%209.25%2C16.02%20-9.25%2C16.02%20-18.5%2C0%20-9.25%2C-16.02%209.25%2C-16.02%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%2718.5%2C34.64%209.25%2C50.66%20-9.25%2C50.66%20-18.5%2C34.64%20-9.25%2C18.62%209.25%2C18.62%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%2748.5%2C-17.32%2039.25%2C-1.3%2020.75%2C-1.3%2011.5%2C-17.32%2020.75%2C-33.34%2039.25%2C-33.34%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%2748.5%2C17.32%2039.25%2C33.34%2020.75%2C33.34%2011.5%2C17.32%2020.75%2C1.3%2039.25%2C1.3%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%2748.5%2C51.96%2039.25%2C67.98%2020.75%2C67.98%2011.5%2C51.96%2020.75%2C35.94%2039.25%2C35.94%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%2778.5%2C0%2069.25%2C16.02%2050.75%2C16.02%2041.5%2C0%2050.75%2C-16.02%2069.25%2C-16.02%27%20fill%3D%27%23161616%27/%3E%3Cpolygon%20points%3D%2778.5%2C34.64%2069.25%2C50.66%2050.75%2C50.66%2041.5%2C34.64%2050.75%2C18.62%2069.25%2C18.62%27%20fill%3D%27%23161616%27/%3E%3C/svg%3E");
+    background-size:80px 46.19px;
+    background-position:center;
+    transition:background-size .4s ease;
+    border-radius:4px;
+    border:3px solid var(--silver);
+    box-shadow:
+      inset 0 0 0 1.5px rgba(255,255,255,0.55),
+      inset 0 3px 10px rgba(0,0,0,0.75),
+      0 1px 2px rgba(0,0,0,0.4);
+    z-index:1;
+    overflow:hidden;
+  }
+
+  /* Keep the recessed hex pattern strictly inside the case face.
+   The numbered face remains separate and unchanged. */
+.case-interior{
+  overflow:hidden;
+}
+
+  /* The "cover" (front face plate showing the case number) is hinged at the BOTTOM.
+     Opening it rotates the top edge away first, so the amount underneath is revealed
+     top-to-bottom as it swings open - like actually lifting a briefcase lid, not a pop-in. */
+  .num{
+    position:absolute;
+  left:2%;
+  right:2%;
+  top:10%;
+  bottom:8%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+    font-family:'Oswald','Arial Narrow',sans-serif;
+    font-weight:700;
+    font-size:2.8rem;
+    color:#20242b;
+    text-shadow:0 1px 0 rgba(255,255,255,0.5);
+    background:linear-gradient(155deg,var(--silver-lt) 0%, var(--silver) 45%, var(--silver-mid) 75%, var(--silver-dk) 100%);
+    border-radius:2px 2px 2px 2px;
+    box-shadow:inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.5);
+    transform-origin:bottom center;
+    transform:rotateX(0deg);
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    will-change:transform;
+    z-index:3;
+    line-height:1;
+  }
+  .briefcase.lid-open .num{
+    animation:coverSwing 0.85s cubic-bezier(.25,.6,.3,1) forwards;
+  }
+  @keyframes coverSwing{
+    0%{transform:rotateX(0deg);}
+    60%{transform:rotateX(-122deg);} /* swings up & toward the viewer, past its resting point */
+    100%{transform:rotateX(-108deg);}
+  }
+
+  .amount-val{
+    position:absolute;left:50%;top:53.25%;
+    transform:translate(-50%,-50%) scaleY(1.7) scaleX(1.1);
+    transform-origin:center center;
+    display:inline-flex;align-items:center;justify-content:center;
+    width:max-content;
+    max-width:82%;
+    font-family:'Michroma',sans-serif;
+    font-weight:400;
+    font-size:2rem;
+    color:white;
+    -webkit-text-stroke:2px white;
+    z-index:2;
+    text-align:center;
+    line-height:1;
+    white-space:nowrap;
+  }
+  .briefcase-currency{
+    font-size:0.72em;
+    -webkit-text-stroke:0.7px currentColor;
+  }
+
+  .case-glow{
+    position:absolute;left:50%;top:54%;
+    width:0;height:0;border-radius:50%;
+    background:radial-gradient(circle,rgba(247,216,116,0.95),rgba(247,216,116,0.2) 60%,transparent 75%);
+    transform:translate(-50%,-50%);
+    opacity:0;
+    pointer-events:none;
+    z-index:6;
+  }
+  /* Value plate — black block behind the case value (hex interior only;
+     US Style keeps its own look inside .usgrid-center). Like the show:
+     dark rectangle, softly glowing off-white digits, no heavy outline. */
+  .briefcase > .amount-val:not(:empty){
+    background:linear-gradient(180deg,#181818,#050505);
+    border:1px solid rgba(255,255,255,0.07);
+    padding:0 0em 0.08em 0;
+    line-height:0.80;
+    margin-top:0.12em;
+    text-indent:-0.05em; /* 1 */
+    box-shadow:0 2px 6px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);
+    color:#e9f4f8;
+    -webkit-text-stroke:1.2px #e9f4f8;
+    text-shadow:0 0 6px rgba(233,244,248,0.35);
+  }
+  .case-particles{position:absolute;left:50%;top:54%;width:0;height:0;z-index:7;pointer-events:none;}
+  .case-particle{
+    position:absolute;left:0;top:0;width:5px;height:5px;border-radius:50%;
+    background:var(--gold-bright);opacity:0;
+  }
+  .case-particle.burst{animation:caseBurst 0.8s ease-out forwards;}
+  @keyframes caseBurst{
+    0%{opacity:1;transform:translate(0,0) scale(1);}
+    100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0.3);}
+  }
+
+  /* the grid button dims to a placeholder while its big twin plays center-stage */
+  .briefcase.lifted{
+    opacity:0.28;
+    filter:grayscale(0.6);
+    pointer-events:none;
+  }
+  /* During a reveal, leave the selected case in focus while the other unopened
+     cases fall into shadow beneath the center-stage spotlight. */
+  .case-grid.reveal-focus .briefcase:not(.focus-case):not(.opened){
+    opacity:0.45;
+    filter:brightness(0.55) saturate(0.65);
+    transform:scale(0.98);
+  }
+
+  .briefcase.your-pick{
+    opacity:0.42;
+    filter:brightness(0.48) saturate(0.4);
+  }
+  .briefcase.your-pick .case-base{
+    box-shadow:0 0 0 3px var(--ice), 0 8px 16px rgba(0,0,0,0.45);
+  }
+  .briefcase.opened{
+    cursor:default;
+    opacity:0.42;
+    filter:brightness(0.48) saturate(0.4);
+  }
+  .briefcase.opened.opened-hidden{
+    opacity:0;
+    transform:scale(0.85);
+    pointer-events:none;
+  }
+  .briefcase.opened .case-base{
+    background:linear-gradient(155deg,#4a4f58,#33373f 55%, #24272d);
+    box-shadow:inset 0 4px 10px rgba(0,0,0,0.55);
+  }
+  .briefcase.opened .num{display:none;}
+  .briefcase.opened .amount-val{
+    font-size:0.5rem;
+    transform:translate(-50%,-50%) scaleY(1.7);
+  }
+
+
+  /* ---------- Clean case face: no extra outer frame around the number ---------- */
+  .briefcase .case-base{
+    background:transparent;
+    box-shadow:none;
+    border-radius:0;
+  }
+
+
+  /* ---------- Night Vision cheat overlay ---------- */
+  .night-vision-tag{
+    position:absolute;
+    left:2%;right:2%;bottom:2%;
+    text-align:center;
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:0.6rem;
+    letter-spacing:0.02em;
+    color:#39ff14;
+    text-shadow:0 0 4px #39ff14, 0 0 8px rgba(57,255,20,0.6);
+    background:rgba(0,10,0,0.65);
+    border:1px solid rgba(57,255,20,0.4);
+    border-radius:3px;
+    padding:1px 2px;
+    z-index:8;
+    pointer-events:none;
+  }
+  .briefcase.night-vision .case-base{
+    box-shadow:0 8px 16px rgba(0,0,0,0.45), inset 0 2px 0 rgba(255,255,255,0.28), inset 0 -6px 10px rgba(0,0,0,0.15), 0 0 0 1px rgba(57,255,20,0.35);
+  }
+
+  /* ===== Case Interior Background Variants ===== */
+  /* US Deal or No Deal style: CSS grid with wide center container */
+  .case-interior.interior-usgrid {
+    background:#34373f;
+    display:grid;
+    grid-template-columns:repeat(8,1fr);
+    grid-template-rows:repeat(6,1fr);
+    gap:2px;
+    padding:2px;
+  }
+  .usgrid-cell{
+    border-radius:1px;
+  }
+  .usgrid-cell.blue{background:#4c525a;}
+  .usgrid-center{
+    grid-column:2/8;
+    grid-row:3/5;
+    background:#2a2827;
+    border-radius:1px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  /* US Style only: value lives inside .usgrid-center (flex child, auto-centered) */
+  .usgrid-center .amount-val{
+    position:static !important;
+    transform:scaleY(1.55) scaleX(1.65) !important;
+    transform-origin:center center !important;
+    margin:-4px 0 0 4px !important;
+    padding:1px 0 !important;
+    left:auto !important;
+    top:auto !important;
+    width:auto !important;
+    max-width:100% !important;
+    font-family:'Oswald','Arial Narrow',sans-serif !important;
+    font-weight:500 !important;
+    font-size:3.1rem !important;
+    line-height:1 !important;
+    -webkit-text-stroke:0 !important;
+    text-align:center;
+    white-space:nowrap;
+    color:#efeaef;
+  }
+  .briefcase.big .usgrid-center .amount-val{font-size:3.2rem !important;transform:scaleY(1.55) scaleX(1.65) !important;}
+  .briefcase.opened .usgrid-center .amount-val{font-size:0.5rem !important;transform:none !important;margin:0 !important;-webkit-text-stroke:0 !important;}
+  .usgrid-dollar{display:inline-block;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:0.75em;vertical-align:baseline;margin-right:0.08em;transform:scaleX(1.40) scaleY(1.12);transform-origin:center center;}
+  .usgrid-comma{display:inline-block;margin-left:-0.06em;margin-right:-0.04em;}
+

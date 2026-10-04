@@ -1,0 +1,66 @@
+  /* ---------- Header / Marquee ---------- */
+  .marquee{text-align:center;margin-bottom:20px;}
+  .marquee .deal-logo{
+    display:block;
+    width:min(100%,260px);
+    height:auto;
+    margin:0 auto;
+    object-fit:contain;
+    filter:drop-shadow(0 3px 0 rgba(0,0,0,0.35)) drop-shadow(0 0 18px rgba(231,187,77,0.2));
+  }
+  .subtitle{
+    font-size:0.95rem;
+    color:var(--muted);
+    margin-top:8px;
+    min-height:1.4em;
+    letter-spacing:0.02em;
+  }
+  .subtitle b{color:var(--gold);font-weight:700;}
+
+  /* ---------- Two-column layout ---------- */
+  .game-layout{
+    display:flex;
+    gap:26px;
+    align-items:flex-end;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .grid-panel{
+    flex:1 1 560px;
+    max-width:640px;
+  }
+  .board-panel{
+    flex:0 0 auto;
+    max-width:360px;
+  }
+  .board-panel:has(.board.board-bg-squares.board-squares-wide){
+    max-width:min(calc(100vw - 24px),520px);
+  }
+  .board-panel:has(.board.board-bg-squares){
+    align-self:flex-start;
+  }
+  @media (max-width:1024px){
+    .board-panel:has(.board.board-bg-squares){
+      margin-inline:auto;
+    }
+  }
+
+  /* ---------- Stage: Your Case ---------- */
+  .stage{display:flex;justify-content:center;margin-top:18px;}
+  .your-case-slot{display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .your-case-label{
+    font-family:'Oswald',sans-serif;
+    font-size:0.72rem;
+    letter-spacing:0.25em;
+    color:var(--ice);
+    text-transform:uppercase;
+  }
+  .your-case-holder{
+    width:84px;height:69px;
+    flex:0 1 84px;
+    min-width:0;
+  }
+  .your-case-holder.filled{
+    box-shadow:0 0 0 4px rgba(231,187,77,0.15), 0 12px 26px rgba(0,0,0,0.4);
+  }
+

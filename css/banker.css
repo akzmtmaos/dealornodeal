@@ -1,0 +1,164 @@
+  /* ---------- Banker offer popup: bottom-right, non-blocking (Previous Offers stacks above it) ---------- */
+  .banker-popup{
+    position:fixed;
+    bottom:86px;left:18px;
+    z-index:92;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:12px;
+    width:min(80vw,230px);
+    opacity:0;
+    transform:translateY(24px);
+    pointer-events:none;
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .banker-popup,
+  .banker-popup *{
+    font-family:'Michroma',sans-serif !important;
+  }
+  .banker-popup.show{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+  }
+  .banker-call-card{
+    text-align:center;
+    animation:none;
+  }
+  .banker-popup.show .banker-call-card{
+    animation:modalIn .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  /* ---------- Banker decisions ---------- */
+  #dealBtn,
+  #noDealBtn,
+  #counterLinkBtn{
+    border:none;
+    border-radius:8px;
+    padding:11px 12px;
+    color:#fff;
+    font-size:0.72rem;
+    font-weight:900;
+    letter-spacing:0.06em;
+    line-height:1.2;
+    text-decoration:none;
+    text-transform:uppercase;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -3px 0 rgba(0,0,0,0.26), 0 3px 7px rgba(0,0,0,0.3);
+  }
+  #dealBtn{
+    background:linear-gradient(180deg,#54c98c,#218356);
+    -webkit-text-stroke:0.2px rgba(255,255,255,0.45);
+  }
+  #noDealBtn{
+    background:linear-gradient(180deg,#ef6470,#b31f35);
+    -webkit-text-stroke:0.2px rgba(255,255,255,0.45);
+  }
+  #counterLinkBtn{
+    display:block;
+    margin:14px auto 0;
+    background:linear-gradient(180deg,#f4a34c,#cd691f);
+    -webkit-text-stroke:0.2px rgba(255,255,255,0.4);
+  }
+  #dealBtn:hover:not(:disabled),
+  #noDealBtn:hover:not(:disabled),
+  #counterLinkBtn:hover:not(:disabled){
+    filter:brightness(1.12);
+    transform:translateY(-1px);
+  }
+  .offers-panel {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 92;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: min(80vw, 180px);
+  }
+  .offers-title {
+    display: block;
+    font-family: 'Michroma', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1a1608;
+    padding: 5px 8px;
+    margin: 0;
+    background: linear-gradient(180deg, var(--yellow-hi), var(--yellow));
+    border: none;
+  }
+.offers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}  .offers-list > div {
+  background: linear-gradient(180deg, var(--yellow-hi), var(--yellow));
+  border: none;
+  border-radius: 0;
+  padding: 5px 8px;
+  color: #1a1608;
+  font-family: 'Michroma', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-align: left;
+  box-shadow: none;
+}
+  .offers-panel .offer-chip{
+    padding:5px 8px !important;
+    background:linear-gradient(180deg, var(--yellow-hi), var(--yellow)) !important;
+    border:none !important;
+    border-radius:0 !important;
+    font-family:'Michroma',sans-serif !important;
+    font-weight:900 !important;
+    text-align:left !important;
+  }
+  .offers-panel .offer-chip .oc-amount{
+    display:block;
+    width:100%;
+    padding:0 !important;
+    margin:0 !important;
+    font-family:'Michroma',sans-serif !important;
+    font-size:1.2rem !important;
+    font-weight:900 !important;
+    text-align:left !important;
+    color:#1a1608 !important;
+  }
+  .offer-chip .oc-round{
+    font-family:'Oswald',sans-serif;
+    font-size:0.62rem;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+  .offer-chip .oc-amount{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.05rem;
+    color:var(--gold-bright);
+  }
+  .offer-chip.latest{
+    background:rgba(231,187,77,0.18);
+    border-color:var(--gold);
+  }
+
+  .offers-panel .offer-chip {
+    animation:previousOfferSlideIn 0.4s ease-out both;
+  }
+  .offers-panel .offer-sequence-item {
+    animation-delay:var(--offer-sequence-delay, 0ms);
+  }
+
+  .offers-panel .offer-chip .oc-amount {
+    animation:previousOfferAmountSlideIn 0.45s ease-out both;
+    animation-delay:inherit;
+  }
+
+  @keyframes previousOfferSlideIn {
+    0% { transform: translateX(-100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes previousOfferAmountSlideIn {
+    0% { transform: translateX(-50%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+  }

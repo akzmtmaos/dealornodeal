@@ -1,0 +1,156 @@
+  /* ---------- Modals (banker offer / final / end) ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;
+    background:rgba(2,3,8,0.82);
+    backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;
+    z-index:90;padding:16px;
+  }
+  .modal-backdrop.show{display:flex;}
+  .modal{
+    background:linear-gradient(180deg,var(--bg-panel-2),var(--bg-panel));
+    border:1px solid rgba(231,187,77,0.25);
+    border-radius:16px;
+    padding:34px 30px;
+    max-width:440px;width:100%;
+    text-align:center;
+    box-shadow:var(--shadow-deep);
+    animation:modalIn .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(0.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .phone-icon{font-size:2.6rem;filter:drop-shadow(0 0 12px rgba(231,187,77,0.5));animation:ring 0.6s infinite;}
+  @keyframes ring{0%,100%{transform:rotate(0);}25%{transform:rotate(-12deg);}75%{transform:rotate(12deg);}}
+  .offer-status{color:var(--muted);margin-top:14px;font-size:0.95rem;letter-spacing:0.02em;}
+  .offer-label{
+    font-family:'Oswald',sans-serif;
+    letter-spacing:0.2em;
+    color:var(--ice);
+    font-size:0.8rem;
+    margin:18px 0 10px;
+    transition:opacity .2s ease;
+  }
+  .offer-buttons{display:flex;gap:12px;justify-content:center;}
+  .offer-buttons.fade-in,
+  .counter-link.fade-in,
+  #revealOfferBtn.fade-in,
+  #continuePlayoutBtn.fade-in,
+  #acknowledgeDealBtn.fade-in{
+    animation:offerFadeUp 0.4s ease forwards;
+  }
+  #revealOfferBtn{margin:6px 0 4px;}
+  #continuePlayoutBtn{margin:6px 0 4px;}
+  .hypo-offers-note{
+    margin:16px 0 4px;
+    padding:12px 14px;
+    background:rgba(95,168,211,0.1);
+    border:1px solid rgba(95,168,211,0.4);
+    border-radius:10px;
+    text-align:center;
+  }
+  .hypo-title{
+    font-family:'Oswald',sans-serif;
+    font-size:0.68rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ice);
+    margin-bottom:8px;
+  }
+  .hypo-chip {
+    font-family: inherit; /* replace with the prize-board font if needed */
+    color: #000;
+    background: #ffd400;
+  }
+  @keyframes offerFadeUp{
+    0%{opacity:0;transform:translateY(10px);}
+    100%{opacity:1;transform:translateY(0);}
+  }
+  .counter-link{
+    display:block;
+    margin:14px auto 0;
+    font-size:0.75rem;
+    color:var(--ice);
+    text-decoration:underline;
+    background:none;
+    border:none;
+    padding:4px;
+  }
+  .counter-link:hover{color:var(--gold);}
+  .counter-panel{
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px solid rgba(139,147,168,0.2);
+  }
+  .counter-label{
+    font-family:'Oswald',sans-serif;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    font-size:0.7rem;
+    color:var(--ice);
+    margin-bottom:10px;
+  }
+  .counter-input-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    margin-bottom:16px;
+  }
+  .counter-dollar{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.4rem;
+    color:var(--gold-bright);
+  }
+  .counter-input-row input{
+    width:150px;
+    background:var(--bg-panel-2);
+    border:1px solid var(--ice-dim);
+    color:var(--ivory);
+    border-radius:6px;
+    padding:8px 10px;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.4rem;
+    text-align:center;
+  }
+  .modal h2{
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:0.05em;
+    font-size:2rem;margin:0 0 6px;
+    color:var(--gold-bright);
+  }
+  .modal p.sub{color:var(--muted);font-size:0.9rem;margin-bottom:20px;}
+  .final-cases{display:flex;gap:16px;justify-content:center;margin:18px 0;flex-wrap:wrap;}
+  .final-case-btn{
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    background:none;border:2px solid rgba(139,147,168,0.3);
+    border-radius:10px;padding:14px 18px;cursor:pointer;color:var(--ivory);
+    transition:all .15s ease;
+  }
+  .final-case-btn:hover{border-color:var(--gold);background:rgba(231,187,77,0.06);}
+  .final-case-btn .fc-num{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold-bright);}
+  .final-case-btn .fc-tag{font-size:0.7rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+  .result-row{display:flex;justify-content:space-around;margin:20px 0;gap:12px;flex-wrap:wrap;}
+  .result-card{background:rgba(255,255,255,0.03);border-radius:10px;padding:14px 18px;flex:1;min-width:130px;}
+  .result-card .rc-label{font-size:0.7rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+  .result-card .rc-val{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold-bright);margin-top:4px;}
+  .result-card.win{outline:2px solid var(--green);}
+  .result-card.danger{outline:2px solid #d13a3a;background:rgba(220,30,30,0.1);}
+  .bad-decision-note{
+    margin:16px 0 4px;
+    padding:12px 14px;
+    background:rgba(220,30,30,0.12);
+    border:1px solid rgba(220,30,30,0.45);
+    border-radius:10px;
+    color:#ff8a8a;
+    font-size:0.85rem;
+    line-height:1.4;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;transition-duration:0.001ms !important;}
+  }
+  @media (max-width:900px){
+    .game-layout{flex-direction:column;align-items:stretch;}
+    .board-panel{max-width:100%;flex-basis:auto;}
+    .grid-panel{max-width:100%;}
+  }
+

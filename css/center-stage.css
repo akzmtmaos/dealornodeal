@@ -1,0 +1,139 @@
+  /* ---------- Center stage: big, centered briefcase opening animation ---------- */
+  .center-stage{
+    position:fixed;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;
+    /* Above the floating board toolbar (95) and game log (96) so the
+       manual Continue button stays clickable on narrow screens. */
+    z-index:97;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .center-stage.show{opacity:1;pointer-events:auto;}
+  .center-stage-row{
+    display:flex;
+    align-items:center;
+    gap:28px;
+  }
+  .briefcase.big{
+    width:min(60vw,340px);
+    height:min(48vw,290px);
+    aspect-ratio:auto;
+    cursor:default;
+  }
+  .briefcase.big .num{font-size:14rem;left:0.8%;right:0.8%;top:9%;bottom:5%;transition:font-size .35s ease;}
+  .briefcase.big .case-interior{left:0.8%;right:0.8%;top:9%;bottom:5%;background-size:104px 60px;transition:background-size .4s ease;}
+  .briefcase.big .amount-val{font-size:2.4rem;top:50.25%;transform:translate(-50%,-50%) scaleY(1.7) scaleX(1.1);transform-origin:center center;}
+  .briefcase.big .case-handle{top:-10%;}
+  .briefcase.big .case-latch{top:5.5%;}
+  .briefcase.big .case-lid{top:6%;}
+  .center-stage-label{
+    margin-top:26px;
+    font-family:'Oswald',sans-serif;
+    letter-spacing:0.25em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-size:0.85rem;
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .center-stage-label.show{opacity:1;}
+
+
+  /* ---------- Manual-open slider ---------- */
+  .manual-slider{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  .slider-track{
+    position:relative;
+    width:16px;
+    height:200px;
+    background:rgba(255,255,255,0.06);
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.15);
+    box-shadow:inset 0 2px 6px rgba(0,0,0,0.5);
+  }
+  .slider-fill{
+    position:absolute;bottom:0;left:0;right:0;
+    height:0%;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    border-radius:0 0 7px 7px;
+  }
+  .slider-handle{
+    position:absolute;left:50%;top:0;
+    transform:translate(-50%,-50%);
+    width:34px;height:34px;
+    border-radius:50%;
+    background:linear-gradient(145deg,var(--silver-lt),var(--silver-dk));
+    box-shadow:0 4px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
+    cursor:grab;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.85rem;
+    color:#333;
+    touch-action:none;
+    user-select:none;
+  }
+  .slider-handle:active{cursor:grabbing;}
+  .slider-caption{
+    font-family:'Oswald',sans-serif;
+    font-size:0.62rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    text-align:center;
+    line-height:1.4;
+  }
+  .manual-back{
+    position:absolute;
+    top:18px;
+    left:18px;
+    margin:0;
+  }
+
+  /* Continue button shown at the bottom center after a manual case reveal.
+     Styled like the ghost Back button; fades in via the .show class. */
+  .manual-continue{
+    position:absolute;
+    bottom:18px;
+    left:50%;
+    transform:translateX(-50%);
+    margin:0;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .45s ease;
+  }
+  .manual-continue.show{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .manual-continue.show{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  .briefcase.pulse{animation:casePulse .35s ease;}
+  @keyframes casePulse{
+    0%{transform:scale(1);}
+    45%{transform:scale(0.88);}
+    100%{transform:scale(1);}
+  }
+
+  /* dim spotlight while a case is being opened */
+  .spotlight-backdrop{
+    position:fixed;inset:0;
+    background:rgba(2,3,8,0.72);
+    backdrop-filter:blur(1.5px);
+    z-index:40;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease, background .3s ease;
+  }
+  .spotlight-backdrop.show{opacity:1;}
+  .spotlight-backdrop.calling-tint{
+    background:radial-gradient(circle at 20% 80%, rgba(180,20,20,0.55), rgba(40,5,5,0.85) 75%);
+  }
+

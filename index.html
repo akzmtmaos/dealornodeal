@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal or No Deal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Archivo+Black&family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Oswald:wght@300;500;600;700&family=Americana+Condensed:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=38">
+</head>
+<body>
+<div class="app">
+
+  <div class="marquee">
+    <img class="deal-logo" src="logo.png" alt="Deal or No Deal">
+    <div class="subtitle" id="statusLine">Pick a briefcase below to hold as <b>your case</b>.</div>
+  </div>
+
+  <div class="game-layout">
+    <div class="grid-panel">
+      <section class="case-grid" id="caseGrid"></section>
+      <div class="stage">
+        <div class="your-case-slot">
+          <div class="your-case-label">Your Case</div>
+          <div class="your-case-holder" id="yourCaseHolder">
+            <div class="case-glow"></div>
+            <div class="case-particles"></div>
+            <div class="case-base"></div>
+            <div class="case-interior"></div>
+            <div class="case-handle"></div>
+            <div class="case-lid"></div>
+            <div class="case-latch"></div>
+            <span class="num">?</span>
+            <span class="amount-val"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="board-panel">
+      <div class="board-panel-inner">
+        <div class="banker-offer-tile" id="bankerOfferDisplay"></div>
+        <div class="board" id="board">
+          <div class="board-col" id="boardColLow"></div>
+          <div class="board-col" id="boardColHigh">  </div>
+
+
+</div>
+
+  <div class="board-toolbar">
+    <button class="btn" id="editToggle">Edit Values</button>
+    <button class="btn primary" id="saveValuesBtn" style="display:none;">Save Values</button>
+    <button class="btn" id="resetValuesBtn">Reset</button>
+    <button class="btn" id="shuffleBtn">Shuffle</button>
+    <button class="board-save-btn" id="boardSaveBtn" title="Save to Prize Board Selection">💾</button>
+  </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="spotlight-backdrop" id="spotlightBackdrop"></div>
+<div class="danger-flash" id="dangerFlash"></div>
+
+<button class="settings-gear" id="settingsGear" title="Settings" aria-label="Settings">⚙</button>
+<button class="settings-gear pb-select-btn" id="pbSelectBtn" title="Prize Board Selection" aria-label="Prize Board Selection" style="top:56px;">🏆</button>
+<button class="settings-gear pb-select-btn" id="suggestBtn" title="Suggest Elimination Order" aria-label="Suggest Elimination Order" style="top:98px;">🎲</button>
+<button class="settings-gear pb-select-btn" id="bgPickerBtn" title="Customization" aria-label="Customization" style="top:140px;">🎨</button>
+<div class="settings-panel" id="settingsPanel" style="display:none;">
+  <div class="settings-title">Settings</div>
+  <label class="settings-row">
+    <input type="checkbox" id="manualModeToggle" checked>
+    <span>Manual case opening<br><small>Drag the slider down to open a case yourself, instead of the automatic reveal.</small></span>
+  </label>
+  <label class="settings-row night-vision-row">
+    <input type="checkbox" id="nightVisionToggle">
+    <span>🟢 Night Vision Mode<br><small>Cheat: reveals the hidden value on every unopened case.</small></span>
+  </label>
+  <label class="settings-row">
+    <input type="checkbox" id="currencyBoardToggle">
+    <span>Show $ on Prize Board<br><small>Display the dollar sign on the prize board and banker offers.</small></span>
+  </label>
+  <label class="settings-row">
+    <input type="checkbox" id="currencyBriefcaseToggle">
+    <span>Show $ on Briefcases<br><small>Display the dollar sign inside opened briefcases.</small></span>
+  </label>
+  <label class="settings-row">
+    <input type="checkbox" id="hideOpenedCasesToggle">
+    <span>Hide Opened Cases<br><small>Remove opened briefcases from the grid after they are revealed.</small></span>
+  </label>
+  <label class="settings-row">
+    <input type="checkbox" id="gameLogEnabledToggle" checked>
+    <span>Enable Game Log<br><small>Show the activity report panel in the bottom-right corner. Turn off to hide it and stop recording.</small></span>
+  </label>
+  <div class="settings-title settings-section-title" style="margin-bottom:8px;">🔊 Sound</div>
+  <label class="settings-row">
+    <input type="checkbox" id="soundToggle" checked>
+    <span>Sound Effects<br><small>Case reveal, banker call, and prize-board elimination sounds.</small></span>
+  </label>
+  <label class="settings-row volume-row">
+    <span style="flex:1;">Volume<br><small>100% is normal — turn up past that for extra loud.</small></span>
+    <input type="range" id="sfxVolumeInput" min="0" max="200" value="130">
+  </label>
+  <label class="settings-row case-count-row">
+    <span style="flex:1;">Number of Briefcases</span>
+  </label>
+  <div class="case-count-input-row">
+    <input type="number" id="caseCountInput" min="4" max="26" value="26">
+    <button class="btn ghost" id="applyCaseCountBtn">Apply</button>
+  </div>
+  <div class="settings-actions" style="display:flex;gap:8px;margin-top:8px;">
+    <button class="btn primary" id="saveSettingsBtn" style="flex:1;">Save</button>
+    <button class="btn ghost" id="closeSettingsBtn" style="flex:1;">Close</button>
+  </div>
+</div>
+
+<div class="pb-select-panel" id="pbSelectPanel" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="pb-select-card">
+    <div class="settings-title">Prize Board Selection</div>
+    <input type="text" id="pbSaveName" placeholder="Board name..." maxlength="24" style="width:100%;box-sizing:border-box;padding:6px 10px;margin-bottom:12px;border-radius:8px;border:1px solid rgba(139,147,168,0.3);background:rgba(255,255,255,0.05);color:var(--ivory);font-size:0.78rem;font-family:'Inter',sans-serif;outline:none;">
+    <div class="pb-list" id="pbList" style="flex:1;overflow-y:auto;"></div>
+    <div class="pb-save-row" style="margin-top:12px;">
+      <button class="btn primary" id="pbSaveConfirmBtn">Save</button>
+      <button class="btn ghost" id="closePbSelectBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="suggest-panel" id="suggestPanel" style="display:none;">
+  <div class="suggest-header">
+    <span class="settings-title" style="margin:0;">🎲 Suggested Elimination Order</span>
+    <button class="suggest-close-btn" id="closeSuggestBtn">✕</button>
+  </div>
+  <div class="suggest-body" id="suggestBody"></div>
+  <button class="btn primary" id="suggestRegenBtn" style="width:100%;margin-top:8px;">🎲 Regenerate</button>
+</div>
+
+<div class="bg-picker-panel" id="bgPickerPanel" style="display:none;">
+  <div class="bg-picker-card">
+    <div class="settings-title">Customization</div>
+    <div class="cust-tabs">
+      <button class="cust-tab active" data-tab="interior">Case Interior Background</button>
+      <button class="cust-tab" data-tab="board">Prize Board Value Background</button>
+    </div>
+    <div class="cust-tab-content active" id="custTabContentInterior">
+      <div class="bg-picker-grid" id="bgPickerGrid"></div>
+    </div>
+    <div class="cust-tab-content" id="custTabContentBoard">
+      <div class="bg-picker-grid" id="boardBgPickerGrid"></div>
+    </div>
+    <div class="pb-save-row" style="margin-top:12px;">
+      <button class="btn ghost" id="closeBgPickerBtn">Close</button>
+    </div>
+  </div>
+</div>
+<div class="game-log-panel" id="gameLogPanel">
+  <div class="game-log-header" id="gameLogHeader">
+    <span>Game Log</span>
+    <span class="game-log-toggle" id="gameLogToggle">▾</span>
+  </div>
+  <div class="game-log-list" id="gameLogList"></div>
+</div>
+
+<div class="custom-bank-offer" id="customBankOfferWrap">
+  <button class="custom-bank-offer-toggle" id="customBankOfferBtn" type="button" aria-label="Custom Bank Offer">+</button>
+  <input class="custom-bank-offer-input" id="customBankOfferInput" type="number" min="0" step="1" placeholder="Offer" aria-label="Custom banker offer" style="display:none;">
+</div>
+
+<div class="center-stage" id="centerStage">
+  <div class="center-stage-row">
+    <button class="briefcase big" id="centerCase" disabled></button>
+    <div class="manual-slider" id="manualSlider" style="display:none;">
+      <div class="slider-track" id="sliderTrack">
+        <div class="slider-fill" id="sliderFill"></div>
+        <div class="slider-handle" id="sliderHandle">⠿</div>
+      </div>
+      <div class="slider-caption">Drag<br>to open</div>
+    </div>
+  </div>
+  <div class="center-stage-label" id="centerStageLabel">Case</div>
+  <button class="btn ghost manual-continue" id="manualContinueBtn" style="display:none;">Continue</button>
+  <button class="btn ghost manual-back" id="manualBackBtn" style="display:none;">Back</button>
+</div>
+
+<!-- Previous Offers (fixed top-left) -->
+<div class="offers-panel" id="offersPanel" style="display:none;">
+  <div class="offers-title">Previous Offers</div>
+  <div class="offers-list" id="offersList"></div>
+</div>
+
+<!-- Banker offer popup (bottom-left) -->
+<div class="banker-popup" id="offerBackdrop">
+  <div class="modal banker-call-card" id="bankerCallCard">
+    <div class="phone-icon">☎️</div>
+    <div class="offer-status" id="offerStatus">The banker is calling...</div>
+    <div id="offerContent" style="display:none;">
+      <div class="offer-label" id="offerLabel">The Banker Offers You</div>
+      <button class="btn primary" id="revealOfferBtn" style="display:none;">Reveal</button>
+      <button class="btn primary" id="continuePlayoutBtn" style="display:none;">Continue</button>
+      <div class="offer-buttons" id="postDealActions" style="display:none;">
+        <button class="btn ghost" id="acknowledgeDealBtn">Let's See</button>
+        <button class="btn primary" id="instantRevealBtn">Instant Reveal</button>
+      </div>
+      <div class="offer-buttons" id="offerButtonsRow" style="display:none;">
+        <button class="btn primary" id="dealBtn">DEAL</button>
+        <button class="btn ghost" id="noDealBtn">NO DEAL</button>
+      </div>
+      <button class="btn ghost counter-link" id="counterLinkBtn" style="display:none;">Make a Counter Offer</button>
+      <div class="counter-panel" id="counterPanel" style="display:none;">
+        <div class="counter-label">Your Counter Offer</div>
+        <div class="counter-input-row">
+          <span class="counter-dollar">$</span>
+          <input type="number" id="counterInput" min="0" step="any">
+        </div>
+        <div class="offer-buttons">
+          <button class="btn primary" id="submitCounterBtn">Submit</button>
+          <button class="btn ghost" id="cancelCounterBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div id="counterStatus" class="offer-status" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- Final swap decision modal -->
+<div class="modal-backdrop" id="finalBackdrop">
+  <div class="modal">
+    <h2>Final Decision</h2>
+    <p class="sub" id="finalSub">Two cases remain. Keep yours, or switch?</p>
+    <div class="final-cases" id="finalCases"></div>
+  </div>
+</div>
+
+<!-- End of game modal -->
+<div class="modal-backdrop" id="endBackdrop">
+  <div class="modal">
+    <h2 id="endTitle">Game Over</h2>
+    <p class="sub" id="endSub"></p>
+    <div class="result-row" id="endResults"></div>
+    <div class="bad-decision-note" id="badDecisionNote" style="display:none;"></div>
+    <button class="btn primary" id="playAgainBtn">Play Again</button>
+  </div>
+</div>
+
+<script>
+  // The modular game (js/main.js) is an ES module, which requires http(s://).
+  // When opened directly from disk (file://), fall back to the bundled script.js.
+  (function () {
+    var isFile = window.location.protocol === 'file:';
+    if (isFile) {
+      document.write('<script src="script.js?v=56"><\/script>');
+    } else {
+      var s = document.createElement('script');
+      s.type = 'module';
+      s.src = 'js/main.js?v=23';
+      document.body.appendChild(s);
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,552 @@
+  /* ---------- Board (right side, classic yellow) ---------- */
+  .board-panel-inner{
+    background:var(--board-frame);
+    border-radius:16px;
+    padding:10px;
+    overflow:visible;
+    box-shadow:var(--shadow-deep);
+    border:1px solid rgba(0,0,0,0.4);
+  }
+  .board-title{
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:0.15em;
+    text-align:center;
+    color:var(--yellow);
+    font-size:1.3rem;
+    margin:2px 0 8px;
+    text-shadow:0 0 14px rgba(255,204,51,0.35);
+  }
+  .banker-offer-tile{
+    display:flex;align-items:center;justify-content:center;
+    width:100%;
+    min-height:1.8em;
+    padding:5px 12px;
+    border-radius:8px;
+    font-family:'Michroma','Archivo Black','Anton',sans-serif;
+    font-weight:400;
+    font-size:2.1rem;
+    letter-spacing:0;
+    background:linear-gradient(180deg,var(--yellow-hi),var(--yellow) 55%, var(--yellow-dk));
+    color:#1a1608;
+    -webkit-text-stroke:2.2px #1a1608;
+    box-shadow:inset 0 -4px 0 rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.5), 0 3px 6px rgba(0,0,0,0.35);
+    margin-bottom:10px;
+  }
+  .banker-offer-tile{
+    perspective:400px;
+  }
+  .banker-offer-tile.flip-anim{
+    animation:tileFlip 0.6s cubic-bezier(.45,0,.55,1);
+  }
+  @keyframes tileFlip{
+    0%{transform:rotateX(0deg);}
+    50%{transform:rotateX(-90deg);}
+    51%{transform:rotateX(90deg);}
+    100%{transform:rotateX(0deg);}
+  }
+  .banker-offer-tile.no-deal{
+    background:linear-gradient(180deg,#e05050,#b82020 55%,#8a1414 100%);
+    color:#fff;
+    -webkit-text-stroke:2.2px #ffffff;
+    box-shadow:inset 0 -4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.25), 0 3px 6px rgba(0,0,0,0.35);
+  }
+  .banker-offer-tile.counter-offer{
+    flex-direction:column;
+    gap:7px;
+    padding:10px;
+    background:#050607;
+    color:#fff;
+    -webkit-text-stroke:0;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12), 0 3px 6px rgba(0,0,0,0.35);
+  }
+  .counter-tile-label{
+    font-family:'Michroma',sans-serif;
+    font-size:0.6rem;
+    font-weight:400;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:#f1eee5;
+  }
+  .counter-tile-amount{
+    width:100%;
+    padding:7px 8px;
+    background:linear-gradient(180deg,#f4a34c,#cd691f);
+    color:#1c0c03;
+    font-family:'Michroma',sans-serif;
+    font-size:1.35rem;
+    font-weight:400;
+    line-height:1.2;
+    text-align:center;
+    -webkit-text-stroke:1px #1c0c03;
+  }
+  /* Floating board toolbar — sits pinned at the bottom, just left of the game
+     log panel, outside the prize board itself. */
+  .board-toolbar{
+    position:fixed;
+    bottom:18px;
+    left:18px;
+    z-index:95;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    justify-content:center;
+    align-items:center;
+    max-width:min(48vw,440px);
+    padding:7px 10px;
+    background:linear-gradient(180deg,var(--bg-panel-2),var(--bg-panel));
+    border:1px solid rgba(139,147,168,0.25);
+    border-radius:999px;
+    box-shadow:var(--shadow-deep);
+  }
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:0.72rem;
+    padding:7px 12px;
+    border-radius:999px;
+    border:1px solid rgba(139,147,168,0.3);
+    background:rgba(255,255,255,0.03);
+    color:var(--ivory);
+    cursor:pointer;
+    letter-spacing:0.02em;
+    transition:all .15s ease;
+  }
+  .btn:hover:not(:disabled){background:rgba(255,255,255,0.08);border-color:var(--ice);}
+  .btn:disabled{opacity:0.3;cursor:not-allowed;}
+  .btn.primary{background:linear-gradient(145deg,var(--gold-bright),var(--gold));color:#221a05;border:none;font-size:0.85rem;padding:10px 20px;}
+  .btn.primary:hover:not(:disabled){filter:brightness(1.08);}
+  .btn.danger{background:linear-gradient(145deg,#e14a5f,var(--danger));color:#fff;border:none;}
+  .btn.danger:hover:not(:disabled){filter:brightness(1.1);}
+  .btn.ghost{background:transparent;font-size:0.85rem;padding:10px 20px;}
+
+  .board{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    background:var(--board-bg);
+    border-radius:10px;
+    padding:8px;
+    overflow:visible;
+  }
+  .board-col{position:relative;z-index:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+  .board-col:has(.amount-row.eliminating){z-index:20;}
+  .amount-row:has(.currency-sym){justify-content:space-between;}
+  .currency-sym{font-size:0.88rem;opacity:0.7;flex-shrink:0;}
+  .currency-num{font-size:0.88rem;text-align:right;}
+  .amount-row{
+    display:flex;align-items:center;justify-content:flex-end;
+    align-self:flex-end;
+    width:fit-content;
+    white-space:nowrap;
+    padding:5px 8px;
+    border-radius:0;
+    font-family:'Michroma','Archivo Black','Anton',sans-serif;
+    font-weight:400;
+    font-size:0.88rem;
+    letter-spacing:0;
+    background:linear-gradient(180deg,var(--yellow-hi),var(--yellow));
+    color:#1a1608;
+    -webkit-text-stroke:1.1px #1a1608;
+    box-shadow:none;
+    transition:transform .3s ease, opacity .3s ease, background .3s ease, box-shadow .3s ease, color .3s ease;
+  }
+  .amount-row.eliminating{
+    position:relative;
+    z-index:10;
+    animation:rowEliminate 1.7s cubic-bezier(.45,.05,.55,.95) forwards;
+    transform-origin:center center;
+  }
+  .amount-row.eliminating > span{
+    animation:rowValueHide 1.7s ease forwards;
+  }
+
+  @keyframes rowEliminate{
+    0%{
+      transform:perspective(700px) rotateX(0deg) scale(1);
+      opacity:1;
+      background:var(--yellow);
+    }
+
+    /* Zoom in — dramatic push. */
+    22%{
+      transform:perspective(700px) rotateX(0deg) scale(1.20);
+      opacity:1;
+      background:var(--yellow);
+    }
+    /* Hold a beat before the flip. */
+    30%{
+      transform:perspective(700px) rotateX(0deg) scale(1.20);
+      opacity:1;
+      background:var(--yellow);
+    }
+
+    /* Single flip fast — 0° to 180° (yellow). */
+    33%{
+      transform:perspective(700px) rotateX(90deg) scale(1.20);
+      opacity:1;
+      background:var(--yellow);
+    }
+    36%{
+      transform:perspective(700px) rotateX(180deg) scale(1.20);
+      opacity:1;
+      background:var(--yellow);
+    }
+    /* Hold — flipped, still yellow. */
+    44%{
+      transform:perspective(700px) rotateX(180deg) scale(1.20);
+      opacity:1;
+      background:var(--yellow);
+    }
+
+    /* Zoom out — still yellow. */
+    65%{
+      transform:perspective(700px) rotateX(180deg) scale(1);
+      opacity:1;
+      background:var(--yellow);
+    }
+    /* Hold yellow for a beat after zoom lands. */
+    72%{
+      transform:perspective(700px) rotateX(180deg) scale(1);
+      opacity:1;
+      background:var(--yellow);
+    }
+    /* Instant snap to dark eliminated tile + flip back upright. */
+    72.1%{
+      transform:perspective(700px) rotateX(0deg) scale(1);
+      opacity:.5;
+      background:#242424;
+      color:#5a5a5a;
+      -webkit-text-stroke:1.1px #5a5a5a;
+      box-shadow:inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+    /* Hold final state. */
+    100%{
+      transform:perspective(700px) rotateX(0deg) scale(1);
+      opacity:.5;
+      background:#242424;
+      color:#5a5a5a;
+      -webkit-text-stroke:1.1px #5a5a5a;
+      box-shadow:inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+  }
+  @keyframes rowValueHide{
+    0%,30%{opacity:1;}
+    31%,72%{opacity:0;}
+    72.1%,100%{opacity:1;}
+  }
+  .amount-row.eliminated{
+    background:#242424;
+    color:#5a5a5a;
+    -webkit-text-stroke:1.1px #5a5a5a;
+    opacity:0.5;
+    box-shadow:inset 0 2px 4px rgba(0,0,0,0.5);
+    transform:scale(1);
+  }
+  /* ===== Prize Board Value Background variants (picked in Customization) ===== */
+  .board.board-bg-blue .amount-row:not(.eliminated){
+    background:linear-gradient(180deg,#2f66ff,#1237b8);
+    color:#eef2ff;
+    -webkit-text-stroke:1.1px #0a1f7a;
+  }
+  .board.board-bg-gold .amount-row:not(.eliminated){
+    background:linear-gradient(180deg,#f7d874,#c99b2e);
+  }
+  .board.board-bg-red .amount-row:not(.eliminated){
+    background:linear-gradient(180deg,#e8505f,#a11f2e);
+    color:#fff;
+    -webkit-text-stroke:1.1px #5c0a14;
+  }
+  .board.board-bg-emerald .amount-row:not(.eliminated){
+    background:linear-gradient(180deg,#1fae6a,#0b6b3d);
+    color:#eafff3;
+    -webkit-text-stroke:1.1px #06401f;
+  }
+  .board.board-bg-dark .amount-row:not(.eliminated){
+    background:linear-gradient(180deg,#3a3f4a,#1e222b);
+    color:#cfd4de;
+    -webkit-text-stroke:1.1px #0c0e14;
+  }
+  /* Squares — the tile behind the cells is transparent; each digit sits in its
+     own yellow square directly on the board. */
+  .board.board-bg-squares .amount-row{
+    position:relative;
+    background:transparent;
+    box-shadow:none;
+    transform:scaleX(1.08) scaleY(1.12);
+    /* Resting rows anchor at the RIGHT edge (pre-rework layout): the 1.08
+       visual widening grows leftward into the board's padding instead of
+       pushing the right column's digits past the frame. The elimination
+       zoom is unaffected — it animates the child spans, which keep their
+       own centered transform-origins. */
+    transform-origin:right center;
+    /* Never wider than the column — lets cells compress on narrow windows
+       instead of spilling past the board frame. */
+    max-width:100%;
+    padding:0;
+    margin:0;
+    gap:1px;
+    color:#1a1608;
+    -webkit-text-stroke:0;
+  }
+  .board.board-bg-squares{
+    padding-left:8px;
+    column-gap:46px;
+  }
+  /* Shrink-to-fit: on narrow windows the fixed 20px cells would overflow the
+     frame — allow columns, value spans and cells to compress instead. */
+  .board.board-bg-squares .board-col{
+    flex:0 1 auto;
+    min-width:0;
+  }
+  .board.board-bg-squares #boardColLow{
+    transform:none;
+  }
+  .board.board-bg-squares #boardColLow .amount-row{
+    transform-origin:left center;
+  }
+  .board.board-bg-squares .amount-row > span{
+    min-width:0;
+    flex-shrink:1;
+  }
+  .board.board-bg-squares .amount-row .sq-char{
+    flex:0 1 20px;
+    min-width:0;
+  }
+  .board.board-bg-squares .amount-row .removed-value{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    padding-right:1px;
+    color:#777;
+    font-family:'Michroma','Archivo Black','Anton',sans-serif;
+    font-size:1.05rem;
+    font-weight:900;
+    line-height:1;
+    opacity:0;
+    pointer-events:none;
+    transform:none !important;
+    animation:none !important;
+  }
+  .board.board-bg-squares .amount-row .removed-value .sq-char{
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  .board.board-bg-squares .amount-row .removed-value .sq-char-value{
+    color:#777;
+    -webkit-text-stroke:0;
+  }
+  .board.board-bg-squares .amount-row .removed-value.visible,
+  .board.board-bg-squares .amount-row.squares-after-glow .removed-value{
+    opacity:1 !important;
+  }
+  .board.board-bg-squares .board-col{
+    gap:8px;
+  }
+  .board.board-bg-squares .amount-row.eliminating{
+    background:transparent !important;
+    box-shadow:none !important;
+    animation:squaresRowFade 2.0s ease forwards;
+  }
+  /* Zoom direction: both columns zoom symmetrically around their own center
+     (small zoom) — no more left/right directional anchoring. The spans keep
+     the base .eliminating > span centered transform-origin. */
+  .board.board-bg-squares .amount-row.eliminating > span:not(.removed-value){
+    animation:squaresValueContainerFlip 2.0s cubic-bezier(.45,.05,.55,.95) forwards;
+    opacity:1 !important;
+  }
+  /* Base .removed-value already starts at opacity:0; the right column keeps it
+     hidden (its grey peek lives in the span) while the left column's keyframes
+     fade it in at the flip moment. */
+  .board.board-bg-squares .amount-row.eliminating .removed-value{
+    animation:none !important;
+    transform:none !important;
+  }
+  /* Grey overlay: sibling of the flipping span, not inside it — stays still on
+     both columns and only becomes visible at 70%, once the glow has finished. */
+  .board.board-bg-squares #boardColLow .amount-row.eliminating .removed-value,
+  .board.board-bg-squares #boardColHigh .amount-row.eliminating .removed-value{
+    animation:squaresLeftRemovedValueStill 2.0s linear forwards !important;
+  }
+  @keyframes squaresLeftRemovedValueStill{
+    0%,69.99%{opacity:0;}
+    70%,100%{opacity:1;}
+  }
+  .board.board-bg-squares .amount-row.eliminating .sq-char{
+    animation:squaresCellGlow 2.0s linear forwards;
+  }
+  /* Golden value stays visible while the container zooms, then hides at the
+     flip (~34%) so the grey eliminated value behind can take over. Scoped to
+     the live spans so the grey overlay's own cells are not affected. */
+  .board.board-bg-squares .amount-row.eliminating > span:not(.removed-value) .sq-char-value{
+    animation:squaresValueFlip 2.0s linear forwards;
+  }
+  .board.board-bg-squares .amount-row.squares-flip-complete > span:not(.removed-value) .sq-char-value{
+    opacity:0 !important;
+    visibility:hidden !important;
+  }
+  @keyframes squaresRowFade{
+    0%,100%{opacity:1;}
+  }
+  @keyframes squaresValueContainerFlip{
+    /* Span-level scales compensate for the row's resting scaleX(1.08)
+       scaleY(1.12): 1.08,1.12 -> visual peak 1.15,1.15 (small centered zoom on
+       both columns) -> settle back. */
+    0%{transform:perspective(700px) rotateX(0deg) scale(1,1);}
+    24%{transform:perspective(700px) rotateX(0deg) scale(1.06481,1.02679);}
+    34%{transform:perspective(700px) rotateX(90deg) scale(1.06481,1.02679);}
+    44%,68%{transform:perspective(700px) rotateX(180deg) scale(1.06481,1.02679);}
+    69.99%{transform:perspective(700px) rotateX(180deg) scale(1.06481,1.02679);}
+    70%{transform:perspective(700px) rotateX(0deg) scale(1.06481,1.02679);}
+    100%{transform:perspective(700px) rotateX(0deg) scale(1,1);}
+  }
+  @keyframes squaresCellGlow{
+    0%,44%{background:linear-gradient(180deg,#fff07a 0%,#ffd84d 48%,#e8b72f 100%);box-shadow:inset 0 1px 2px rgba(0,0,0,0.18),0 0 0 1px rgba(0,0,0,0.1);}
+    52%,70%{background:#fffbe0;box-shadow:0 0 12px 4px rgba(255,245,158,0.95),inset 0 0 8px rgba(255,255,255,0.95);}
+    70.01%,100%{background:transparent;box-shadow:none;}
+  }
+  @keyframes squaresValueFlip{
+    0%,28%{opacity:1;visibility:visible;}
+    34%,100%{opacity:0;visibility:hidden;}
+  }
+  .board.board-bg-squares .amount-row > span{
+    display:flex;
+    align-items:center;
+    gap:1px;
+  }
+  .board.board-bg-squares .amount-row .sq-char{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:20px;
+    height:25px;
+    background:linear-gradient(180deg,#fff07a 0%,#ffd84d 48%,#e8b72f 100%);
+    border-radius:2px;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.1);
+    font-size:1.05rem;
+    font-weight:900;
+    line-height:1;
+  }
+  .board.board-bg-squares .amount-row .sq-char-value{
+    display:inline-block;
+    /* Michroma's tall-ascent glyph box (1.43em) sags flex-centered text
+       ~1.25px below cell center at 1.05rem — 1.57px on screen after the
+       value's own scaleY(1.12) and the row's scaleY(1.12) — same mechanism
+       as the offer tile fix. Lift 1.40/16.8 ≈ 8.3% to optically center. */
+    transform:translateY(-2%) scaleY(1.12);
+    transform-origin:center center;
+    -webkit-text-stroke:0.35px #1a1608;
+  }
+  /* Eliminated values keep the same square layout — the cells just go dark. */
+  .board.board-bg-squares .amount-row.eliminated{
+    animation:none;
+    opacity:0.8;
+    color:#8a8a8a;
+  }
+  .board.board-bg-squares .amount-row.eliminated > span{
+    animation:none;
+    transform:none;
+  }
+  .board.board-bg-squares .amount-row.eliminated .sq-char{
+    animation:none;
+    background:transparent;
+    box-shadow:none;
+    opacity:1;
+  }
+  .board.board-bg-squares .amount-row.eliminated .sq-char-value{
+    animation:none;
+    opacity:1;
+    color:#777;
+    -webkit-text-stroke:0;
+  }
+  .board.board-bg-squares .amount-row.eliminated .sq-char-value{
+    opacity:0 !important;
+  }
+  .board.board-bg-squares .amount-row.eliminated .removed-value .sq-char-value,
+  .board.board-bg-squares .amount-row.eliminating.squares-after-glow .removed-value .sq-char-value{
+    opacity:1 !important;
+    visibility:visible !important;
+  }
+  .board.board-bg-squares .amount-row.eliminating.squares-after-glow .removed-value{
+    opacity:1 !important;
+  }
+  .board.board-bg-squares .amount-row.eliminating.squares-after-glow .sq-char-value{
+    opacity:0 !important;
+    visibility:hidden !important;
+  }
+  /* Leading placeholder squares keep every tile the same width as the $1M top
+     prize — same solid gold-yellow cell as the digits, just left blank. */
+  .amount-row.flash-reset{
+    animation:rowFlash 0.5s ease;
+  }
+  @keyframes rowFlash{
+    0%{box-shadow:0 0 0 3px rgba(95,168,211,0.7);}
+    100%{box-shadow:none;}
+  }
+  .amount-row input{
+    width:88%;
+    background:#fff8e0;
+    border:1px solid var(--yellow-dk);
+    color:#1a1608;
+    border-radius:4px;
+    padding:4px 8px;
+    font-family:'Michroma','Archivo Black','Anton',sans-serif;
+    font-weight:400;
+    font-size:0.75rem;
+    text-align:right;
+  }
+  /* ---------- Squares: Banker Offer tile ---------- */
+  /* In Squares mode the offer tile drops its solid tile look and re-renders
+     its amount with the same square-grid cells the prize board uses: a
+     transparent container, one yellow square per character ($ and commas get
+     their own cell), blank squares padding the strip to the same 7-slot
+     width as a $1,000,000 board tile. No black frame.
+     js/customization.js rebuilds the tile's plain text into these cells. */
+  .banker-offer-tile.offer-squares{
+    /* Dark offer-board frame like the TV show: near-black panel, solid black
+       outer border, yellow pinline just inside the border. */
+    background:#1c1c1e;
+    border:3px solid #000;
+    border-radius:8px;
+    box-shadow:inset 0 0 0 2px var(--yellow), 0 3px 6px rgba(0,0,0,0.35);
+    /* Match the classic tile's footprint (min-height:1.8em + 5px padding at
+       2.1rem — the same box DEAL / NO DEAL get); border-box keeps the outer
+       size identical, the cells just sit inside the frame. */
+    min-height:1.8em;
+    align-items:stretch;
+    padding:6px 9px;
+    gap:3px;
+    color:#1a1608;
+    -webkit-text-stroke:0;
+  }
+  /* Same yellow-cell recipe as the board, scaled up to offer-tile size:
+     cells stretch the full height of the tile and share its width (44px cap
+     keeps 7-slot rows chunky; 9-slot rows like 1,000,000 shrink to fit
+     instead of overflowing). */
+  .banker-offer-tile.offer-squares .offer-sq-char{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:1 1 0;
+    min-width:0;
+    max-width:44px;
+    height:auto;
+    background:linear-gradient(180deg,#fff07a 0%,#ffd84d 48%,#e8b72f 100%);
+    border-radius:4px;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.1);
+    font-size:2.1rem;
+    font-weight:900;
+    line-height:1;
+  }
+  .banker-offer-tile.offer-squares .offer-sq-char .sq-char-value{
+    display:inline-block;
+    /* Perfect optical center measured at translateY(-9.1%) (lifts 3.06px);
+       user preference is digits sitting 1px below that — lift only 2.05px
+       (2.05/33.6 ≈ 6.1%). Percentage resolves against the 33.6px glyph box. */
+    transform:translateY(-6.1%) scaleY(1.22);
+    transform-origin:center center;
+    -webkit-text-stroke:0.8px #1a1608;
+  }
+
