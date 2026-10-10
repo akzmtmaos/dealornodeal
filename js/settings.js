@@ -24,7 +24,6 @@ const STORAGE_KEY = 'freebuff-settings';
 function saveSettings() {
   const settings = {
     manualOpenMode: game.manualOpenMode,
-    hostMode: game.hostMode,
     nightVisionMode: game.nightVisionMode,
     showCurrencyBoard: game.showCurrencyBoard,
     showCurrencyBriefcase: game.showCurrencyBriefcase,
@@ -48,10 +47,6 @@ function loadSettings() {
     if (typeof s.manualOpenMode === 'boolean') {
       game.manualOpenMode = s.manualOpenMode;
       dom.manualModeToggle.checked = s.manualOpenMode;
-    }
-    if (typeof s.hostMode === 'boolean') {
-      game.hostMode = s.hostMode;
-      dom.hostModeToggle.checked = s.hostMode;
     }
     if (typeof s.nightVisionMode === 'boolean') {
       game.nightVisionMode = s.nightVisionMode;
@@ -155,13 +150,11 @@ dom.customBankOfferInput.addEventListener('blur', () => {
   if (!dom.customBankOfferInput.value.trim()) {
     closeCustomBankOffer();
   }
-});  dom.manualModeToggle.addEventListener('change', () => {
-    game.manualOpenMode = dom.manualModeToggle.checked;
-  });
+});
 
-  dom.hostModeToggle.addEventListener('change', () => {
-    game.hostMode = dom.hostModeToggle.checked;
-  });
+dom.manualModeToggle.addEventListener('change', () => {
+  game.manualOpenMode = dom.manualModeToggle.checked;
+});
 
 dom.nightVisionToggle.addEventListener('change', () => {
   game.nightVisionMode = dom.nightVisionToggle.checked;

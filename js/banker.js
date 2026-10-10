@@ -10,69 +10,6 @@ import { endGame } from './end.js?v=115';
 import { revealCounterDecision } from './counter.js?v=107';
 import { playBankerRing } from './sound.js?v=105';
 
-/** Host Mode: text-to-speech via Web Speech API */
-let speechSynthesisTimeout = null;
-let hostModeSpeakQueue = [];
-let hostModeIsSpeaking = false;
-
-function getSpeechVoices() {
-  return typeof speechSynthesis !== 'undefined' ? speechSynthesis.getVoices() : [];
-}
-
-function pickVoice(lang) {
-  const voices = getSpeechVoices();
-  if (typeof speechSynthesis === 'undefined') return null;
-  if (voices.length === 0) return null;
-  // Prefer a female voice if available
-  const female = voices.find(v => v.gender === 'female');
-  if (female) return female;
-  // Prefer English
-  const en = voices.find(v => v.lang && v.lang.startsWith('en'));
-  if (en) return en;
-  return voices[0];
-}
-
-function speak(text, opts = {}) {
-  if (typeof speechSynthesis === 'undefined') return;
-  if (game.hostMode && game.sfxEnabled === false) { /* muted */ return; }
-  if (hostModeIsSpeaking) {
-    hostModeSpeakQueue.push({ text, opts });
-    return;
-  }
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = opts.rate || 1;
-  utterance.pitch = opts.pitch || 1;
-  utterance.volume = opts.volume || (game.sfxEnabled ? Math.min(1, game.sfxVolumePercent / 100) : 0);
-  const voice = pickVoice(opts.lang || 'en-US');
-  if (voice) utterance.voice = voice;
-  hostModeIsSpeaking = true;
-  utterance.onend = () => {
-    hostModeIsSpeaking = false;
-    if (hostModeSpeakQueue.length) {
-      const next = hostModeSpeakQueue.shift();
-      speak(next.text, next.opts);
-    }
-  };
-  utterance.onerror = () => {
-    hostModeIsSpeaking = false;
-    if (hostModeSpeakQueue.length) {
-      const next = hostModeSpeakQueue.shift();
-      speak(next.text, next.opts);
-    }
-  };
-  speechSynthesis.speak(utterance);
-}
-
-function clearHostModeQueue() {
-  if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
-  hostModeIsSpeaking = false;
-  hostModeSpeakQueue = [];
-}
-
-function formatAmount(value) {
-  return Math.round(value).toLocaleString('en-US');
-}
-
 // Re-export for counter.js, which (like the original monolith) reaches the
 // final-decision screen through the banker module.
 export { showFinalDecision };
@@ -294,114 +231,9 @@ export function triggerBankerOffer() {
     dom.offerModalEl.classList.remove('banker-calling');
     dom.phoneIconEl.classList.remove('calling');
     dom.offerStatus.style.display = 'none';
-    dom.offerContent.style.display = 'none';
-    dom.hostModeCall.style.display = 'flex';
-    dom.hostModeCall.classList.add('show');
-    dom.hostModeConversation.innerHTML = '';
-    dom.hostModePlayerMessage.innerHTML = '';
-    dom.hostModeAcceptBtn.style.display = 'none';
-    dom.hostModeDeclineBtn.style.display = 'none';
-    dom.hostModeOfferSpoken.style.display = 'none';
-
-    dom.hostModeBotMessage.innerHTML = '<span class="host-mode-name">The Banker</span>: Hello there! I hope you're having a wonderful day. I've got a little proposition for you. Care to hear it?';
-    dom.hostModeBotMessage.style.display = 'block';
-    dom.hostModeCall.classList.add('speaking');
-    speak('Hello there! I hope you are having a wonderful day. I have got a little proposition for you. Care to hear it?');
-
-    setTimeout(() => {
-      dom.hostModeBotMessage.innerHTML = '<span class="host-mode-name">The Banker</span>: That sounds good. Here is what I can offer you today... Now, then... are you ready? Here we go!'
-      speak('That sounds good. Here is what I can offer you today. Now then... are you ready? Here we go!');
-    }, 2200);
-
-    setTimeout(() => {
-      const offerText = 'Oh, and by the way, I think you would be quite happy with ' + formatAmount(game.lastOffer) + ' dollars. That is what I can offer you! Believe me, it is a very good offer.'
-      dom.hostModeBotMessage.innerHTML = '<span class="host-mode-name">The Banker</span>: ' + offerText;
-      dom.hostModeOfferSpoken.style.display = 'block';
-      dom.hostModeOfferText.textContent = '$' + formatAmount(game.lastOffer);
-      speak(offerText, { rate: 0.95 });
-      dom.hostModeAcceptBtn.style.display = '';
-      dom.hostModeDeclineBtn.style.display = '';
-    }, 4200);
-
-    dom.hostModeAcceptBtn.addEventListener('click', () => {
-      dom.hostModeCall.classList.remove('show');
-      dom.hostModeCall.style.display = 'none';
-      dom.hostModeAcceptBtn.style.display = 'none';
-      dom.hostModeDeclineBtn.style.display = 'none';
-      dom.hostModeOfferSpoken.style.display = 'none';
-      dom.offerContent.style.display = 'block';
-      dom.offerLabel.textContent = 'The Banker Offers You';
-      dom.revealOfferBtn.style.display = '';
-      dom.revealOfferBtn.classList.add('fade-in');
-      dom.hostModeBotMessage.style.display = 'none';
-      dom.hostModePlayerMessage.style.display = 'none';
-      dom.hostModeConversation.innerHTML = '';
-      clearHostModeQueue();
-    });
-
-    dom.hostModeDeclineBtn.addEventListener('click', () => {
-      dom.hostModeCall.classList.remove('show');
-      dom.hostModeCall.style.display = 'none';
-      dom.hostModeAcceptBtn.style.display = 'none';
-      dom.hostModeDeclineBtn.style.display = 'none';
-      dom.hostModeOfferSpoken.style.display = 'none';
-      dom.offerContent.style.display = 'none';
-      dom.hostModeBotMessage.style.display = 'none';
-      dom.hostModePlayerMessage.style.display = 'none';
-      dom.hostModeConversation.innerHTML = '';
-      clearHostModeQueue();
-      declineOffer();
-    });
-
-    dom.hostModeMuteBtn.addEventListener('click', () => {
-      if (game.sfxEnabled) {
-        game.sfxEnabled = false;
-        dom.hostModeMuteBtn.textContent = '🔊 Unmute';
-        clearHostModeQueue();
-      } else {
-        game.sfxEnabled = true;
-        dom.hostModeMuteBtn.textContent = '🔇 Mute';
-        if (!hostModeIsSpeaking) {
-          speak('Let us hear the offer now.');
-        }
-      }
-    });
-
-    dom.hostModeEndCallBtn.addEventListener('click', () => {
-      dom.hostModeCall.classList.remove('show');
-      dom.hostModeCall.style.display = 'none';
-      dom.hostModeAcceptBtn.style.display = 'none';
-      dom.hostModeDeclineBtn.style.display = 'none';
-      dom.hostModeOfferSpoken.style.display = 'none';
-      dom.hostModeBotMessage.style.display = 'none';
-      dom.hostModePlayerMessage.style.display = 'none';
-      dom.hostModeConversation.innerHTML = '';
-      clearHostModeQueue();
-      declineOffer();
-    });
-
-    dom.hostModeCall.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-
-    document.addEventListener('click', (e) => {
-      if (dom.hostModeCall.style.display !== 'none' && !dom.hostModeCall.contains(e.target) && e.target !== dom.offerBackdrop) {
-        dom.hostModeCall.classList.remove('show');
-        dom.hostModeCall.style.display = 'none';
-        dom.hostModeAcceptBtn.style.display = 'none';
-        dom.hostModeDeclineBtn.style.display = 'none';
-        dom.hostModeOfferSpoken.style.display = 'none';
-        dom.hostModeBotMessage.style.display = 'none';
-        dom.hostModePlayerMessage.style.display = 'none';
-        dom.hostModeConversation.innerHTML = '';
-        clearHostModeQueue();
-        declineOffer();
-      }
-    });
-
-    setTimeout(() => {
-      dom.offerContent.style.display = 'block';
-    }, 6200);
+    dom.offerContent.style.display = 'block';
+    dom.revealOfferBtn.style.display = '';
+    dom.revealOfferBtn.classList.add('fade-in');
   }, 1400);
 }
 
@@ -451,18 +283,6 @@ export function acceptOffer(amount) {
   dom.offerBackdrop.classList.remove('calling-red');
   document.body.classList.remove('calling-red-bg');
   dom.phoneIconEl.classList.remove('calling');
-
-  if (game.hostMode) {
-    dom.hostModeCall.classList.remove('show');
-    dom.hostModeCall.style.display = 'none';
-    dom.hostModeAcceptBtn.style.display = 'none';
-    dom.hostModeDeclineBtn.style.display = 'none';
-    dom.hostModeOfferSpoken.style.display = 'none';
-    dom.hostModeBotMessage.style.display = 'none';
-    dom.hostModePlayerMessage.style.display = 'none';
-    dom.hostModeConversation.innerHTML = '';
-    clearHostModeQueue();
-  }
 }
 
 export function declineOffer() {
@@ -474,19 +294,6 @@ export function declineOffer() {
   logEvent(`[Round ${game.roundIndex + 1}] <b>NO DEAL.</b> Declined the offer of ${fmt(game.lastOffer)}.`, 'nodeal');
   game.offerHistory.push({ round: game.roundIndex + 1, amount: game.lastOffer });
   renderOffersHistory();
-
-  // Close Host Mode call if it is active
-  if (game.hostMode) {
-    dom.hostModeCall.classList.remove('show');
-    dom.hostModeCall.style.display = 'none';
-    dom.hostModeAcceptBtn.style.display = 'none';
-    dom.hostModeDeclineBtn.style.display = 'none';
-    dom.hostModeOfferSpoken.style.display = 'none';
-    dom.hostModeBotMessage.style.display = 'none';
-    dom.hostModePlayerMessage.style.display = 'none';
-    dom.hostModeConversation.innerHTML = '';
-    clearHostModeQueue();
-  }
 
   dom.bankerOfferDisplay.classList.add('flip-anim');
   setTimeout(() => {
@@ -545,114 +352,9 @@ export function triggerHypotheticalOffer() {
     dom.offerModalEl.classList.remove('banker-calling');
     dom.phoneIconEl.classList.remove('calling');
     dom.offerStatus.style.display = 'none';
-    dom.offerContent.style.display = 'none';
-    dom.hostModeCall.style.display = 'flex';
-    dom.hostModeCall.classList.add('show');
-    dom.hostModeConversation.innerHTML = '';
-    dom.hostModePlayerMessage.innerHTML = '';
-    dom.hostModeAcceptBtn.style.display = 'none';
-    dom.hostModeDeclineBtn.style.display = 'none';
-    dom.hostModeOfferSpoken.style.display = 'none';
-
-    dom.hostModeBotMessage.innerHTML = '<span class="host-mode-name">The Banker</span>: Hello there! I hope you are having a wonderful day. I have got a little proposition for you. Care to hear it?';
-    dom.hostModeBotMessage.style.display = 'block';
-    dom.hostModeCall.classList.add('speaking');
-    speak('Hello there! I hope you are having a wonderful day. I have got a little proposition for you. Care to hear it?');
-
-    setTimeout(() => {
-      dom.hostModeBotMessage.innerHTML = '<span class="host-mode-name">The Banker</span>: That sounds good. Here is what I could have offered you... Now, then... are you ready?'
-      speak('That sounds good. Here is what I could have offered you. Now then... are you ready?');
-    }, 2200);
-
-    setTimeout(() => {
-      const offerText = 'Oh, and by the way, I think you would have been quite happy with ' + formatAmount(hypoOffer) + ' dollars. That is what I could have offered you! Believe me, it is a very good offer.'
-      dom.hostModeBotMessage.innerHTML = '<span class="host-mode-name">The Banker</span>: ' + offerText;
-      dom.hostModeOfferSpoken.style.display = 'block';
-      dom.hostModeOfferText.textContent = '$' + formatAmount(hypoOffer);
-      speak(offerText, { rate: 0.95 });
-      dom.hostModeAcceptBtn.style.display = '';
-      dom.hostModeDeclineBtn.style.display = '';
-    }, 4200);
-
-    dom.hostModeAcceptBtn.addEventListener('click', () => {
-      dom.hostModeCall.classList.remove('show');
-      dom.hostModeCall.style.display = 'none';
-      dom.hostModeAcceptBtn.style.display = 'none';
-      dom.hostModeDeclineBtn.style.display = 'none';
-      dom.hostModeOfferSpoken.style.display = 'none';
-      dom.offerContent.style.display = 'block';
-      dom.offerLabel.textContent = 'The Banker Offers You';
-      dom.revealOfferBtn.style.display = '';
-      dom.revealOfferBtn.classList.add('fade-in');
-      dom.hostModeBotMessage.style.display = 'none';
-      dom.hostModePlayerMessage.style.display = 'none';
-      dom.hostModeConversation.innerHTML = '';
-      clearHostModeQueue();
-    });
-
-    dom.hostModeDeclineBtn.addEventListener('click', () => {
-      dom.hostModeCall.classList.remove('show');
-      dom.hostModeCall.style.display = 'none';
-      dom.hostModeAcceptBtn.style.display = 'none';
-      dom.hostModeDeclineBtn.style.display = 'none';
-      dom.hostModeOfferSpoken.style.display = 'none';
-      dom.offerContent.style.display = 'none';
-      dom.hostModeBotMessage.style.display = 'none';
-      dom.hostModePlayerMessage.style.display = 'none';
-      dom.hostModeConversation.innerHTML = '';
-      clearHostModeQueue();
-      declineOffer();
-    });
-
-    dom.hostModeMuteBtn.addEventListener('click', () => {
-      if (game.sfxEnabled) {
-        game.sfxEnabled = false;
-        dom.hostModeMuteBtn.textContent = '🔊 Unmute';
-        clearHostModeQueue();
-      } else {
-        game.sfxEnabled = true;
-        dom.hostModeMuteBtn.textContent = '🔇 Mute';
-        if (!hostModeIsSpeaking) {
-          speak('Let us hear the offer now.');
-        }
-      }
-    });
-
-    dom.hostModeEndCallBtn.addEventListener('click', () => {
-      dom.hostModeCall.classList.remove('show');
-      dom.hostModeCall.style.display = 'none';
-      dom.hostModeAcceptBtn.style.display = 'none';
-      dom.hostModeDeclineBtn.style.display = 'none';
-      dom.hostModeOfferSpoken.style.display = 'none';
-      dom.hostModeBotMessage.style.display = 'none';
-      dom.hostModePlayerMessage.style.display = 'none';
-      dom.hostModeConversation.innerHTML = '';
-      clearHostModeQueue();
-      declineOffer();
-    });
-
-    dom.hostModeCall.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-
-    document.addEventListener('click', (e) => {
-      if (dom.hostModeCall.style.display !== 'none' && !dom.hostModeCall.contains(e.target) && e.target !== dom.offerBackdrop) {
-        dom.hostModeCall.classList.remove('show');
-        dom.hostModeCall.style.display = 'none';
-        dom.hostModeAcceptBtn.style.display = 'none';
-        dom.hostModeDeclineBtn.style.display = 'none';
-        dom.hostModeOfferSpoken.style.display = 'none';
-        dom.hostModeBotMessage.style.display = 'none';
-        dom.hostModePlayerMessage.style.display = 'none';
-        dom.hostModeConversation.innerHTML = '';
-        clearHostModeQueue();
-        declineOffer();
-      }
-    });
-
-    setTimeout(() => {
-      dom.offerContent.style.display = 'block';
-    }, 6200);
+    dom.offerContent.style.display = 'block';
+    dom.revealOfferBtn.style.display = '';
+    dom.revealOfferBtn.classList.add('fade-in');
   }, 1400);
 }
 
