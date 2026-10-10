@@ -74,6 +74,10 @@
     <input type="checkbox" id="manualModeToggle" checked>
     <span>Manual case opening<br><small>Drag the slider down to open a case yourself, instead of the automatic reveal.</small></span>
   </label>
+  <label class="settings-row">
+    <input type="checkbox" id="hostModeToggle">
+    <span>Host Mode<br><small>When on, the banker calls you with a spoken offer via text-to-speech, then hands you the Reveal button.</small></span>
+  </label>
   <label class="settings-row night-vision-row">
     <input type="checkbox" id="nightVisionToggle">
     <span>🟢 Night Vision Mode<br><small>Cheat: reveals the hidden value on every unopened case.</small></span>
@@ -226,6 +230,30 @@
       </div>
     </div>
     <div id="counterStatus" class="offer-status" style="display:none;"></div>
+  </div>
+  <!-- Host Mode: banker call panel -->
+  <div class="host-mode-call" id="hostModeCall" style="display:none;">
+    <div class="host-mode-header">
+      <div class="phone-icon">☎️</div>
+      <div class="call-title">The banker is calling...</div>
+    </div>
+    <div class="host-mode-conversation" id="hostModeConversation">
+      <div class="host-mode-message host-mode-bot" id="hostModeBotMessage">
+        Hello there! I hope you're having a wonderful day. <span class="host-mode-name">The Banker</span> here — I've got a little proposition for you. Care to hear it?
+      </div>
+      <div class="host-mode-message host-mode-player" id="hostModePlayerMessage"></div>
+    </div>
+    <div class="host-mode-speak-bar">
+      <button class="btn ghost" id="hostModeMuteBtn">🔇 Mute</button>
+      <button class="btn ghost" id="hostModeEndCallBtn">End Call</button>
+    </div>
+    <div class="host-mode-actions">
+      <button class="btn primary" id="hostModeAcceptBtn">Accept Offer</button>
+      <button class="btn ghost" id="hostModeDeclineBtn">Decline Offer</button>
+    </div>
+    <div class="host-mode-offer-spoken" id="hostModeOfferSpoken" style="display:none;">
+      <div class="host-mode-offer-text" id="hostModeOfferText"></div>
+    </div>
   </div>
 </div>
 
